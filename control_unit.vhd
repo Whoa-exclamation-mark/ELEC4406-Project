@@ -37,7 +37,7 @@ ARCHITECTURE control_unit_rtl OF control_unit IS
 		);
 	END COMPONENT;
 
-	TYPE STATE IS (START, RUN, MV_T1, MVI_T1, ADD_T1, ADD_T2, ADD_T3, SUB_T1, SUB_T2, SUB_T3);
+	TYPE STATE IS (RUN, MV_T1, MVI_T1, ADD_T1, ADD_T2, ADD_T3, SUB_T1, SUB_T2, SUB_T3);
 	SIGNAL LS, NS : STATE;
 	SIGNAL IR_IN : STD_LOGIC;
 	SIGNAL IR_DATA : STD_LOGIC_VECTOR( BIT_LENGTH-1 DOWNTO 0);
@@ -59,7 +59,7 @@ BEGIN
 	clk_proc: 
 		PROCESS (CLK, RESETN) BEGIN
 			IF (RESETN = '1') THEN
-				LS <= START;
+				LS <= RUN;
 			ELSIF (CLK'EVENT AND CLK = '1') THEN
 				LS <= NS;
 			END IF;
@@ -80,30 +80,28 @@ BEGIN
 			IR_IN <= '0';
 			R_OUT <= 0;
 			R_IN <= (OTHERS => '0');
+			x := IR_DATA(5 DOWNTO 3);
+			y := IR_DATA(8 DOWNTO 6);
 			CASE (LS) IS 
-				WHEN START =>
-					IF (RUN_SIG = '1') THEN
-						NS <= RUN;
-						IR_IN <= '1';
-					ELSE 
-						NS <= START;
-					END IF;
 				WHEN RUN =>
+					IR_IN <= '1';
 					instruction := IR_DATA(2 DOWNTO 0);
-					x := IR_DATA(5 DOWNTO 3);
-					y := IR_DATA(8 DOWNTO 6);
-					CASE (instruction) IS
-						WHEN "000" => --mv
-							NS <= MV_T1;
-						WHEN "001" => --mvi
-							NS <= MVI_T1;
-						WHEN "010" => --add
-							NS <= ADD_T1;
-						WHEN "011" => --mv
-							NS <= SUB_T1;
-						WHEN OTHERS => --invalid state
-							NS <= START;
-					END CASE;
+					IF (RUN_SIG = '1') THEN
+						CASE (instruction) IS
+							WHEN "000" => --mv
+								NS <= MV_T1;
+							WHEN "001" => --mvi
+								NS <= MVI_T1;
+							WHEN "010" => --add
+								NS <= ADD_T1;
+							WHEN "011" => --mv
+								NS <= SUB_T1;
+							WHEN OTHERS => --invalid state
+								NS <= RUN;
+						END CASE;
+					ELSE
+						NS <= RUN;
+					END IF;
 				WHEN MV_T1 =>
 					R_OUT <= to_integer(unsigned(y))+1;
 					R_IN <= (OTHERS => '0');
@@ -115,7 +113,7 @@ BEGIN
 						END IF;
 					END LOOP;
 					DONE <= '1';
-					NS <= START;
+					NS <= RUN;
 				WHEN MVI_T1 =>
 					DIN_OUT <= '1';
 					FOR I IN 0 TO REG_NUM-1 LOOP
@@ -126,13 +124,13 @@ BEGIN
 						END IF;
 					END LOOP;
 					DONE <= '1';
-					NS <= START;
+					NS <= RUN;
 				WHEN ADD_T1 =>
 					R_OUT <= to_integer(unsigned(x))+1;
 					A_IN <= '1';
 					NS <= ADD_T2;
 				WHEN ADD_T2 =>
-					R_OUT <= to_integer(unsigned(x))+1;
+					R_OUT <= to_integer(unsigned(y))+1;
 					G_IN <= '1';
 					NS <= ADD_T3;
 				WHEN ADD_T3 =>
@@ -145,13 +143,13 @@ BEGIN
 						END IF;
 					END LOOP;
 					DONE <= '1';
-					NS <= START;
+					NS <= RUN;
 				WHEN SUB_T1 =>
 					R_OUT <= to_integer(unsigned(x))+1;
 					A_IN <= '1';
 					NS <= SUB_T2;
 				WHEN SUB_T2 =>
-					R_OUT <= to_integer(unsigned(x))+1;
+					R_OUT <= to_integer(unsigned(y))+1;
 					G_IN <= '1';
 					ADDSUB <= '1';
 					NS <= SUB_T3;
@@ -165,9 +163,9 @@ BEGIN
 						END IF;
 					END LOOP;
 					DONE <= '1';
-					NS <= START;
+					NS <= RUN;
 				WHEN OTHERS =>
-					NS <= START;
+					NS <= RUN;
 			END CASE;
 		END PROCESS;
 END control_unit_rtl;

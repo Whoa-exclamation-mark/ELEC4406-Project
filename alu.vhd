@@ -39,7 +39,7 @@ ARCHITECTURE alu_rlt OF alu IS
 				BIT_LENGTH	: 	INTEGER := 9
 		);
 		PORT(		
-				DATA_IN_1,DATA_IN_2	:	IN STD_LOGIC_VECTOR( BIT_LENGTH - 1 DOWNTO 0);
+				DATA_IN					:	IN STD_LOGIC_VECTOR( BIT_LENGTH - 1 DOWNTO 0);
 				A_IN,G_IN				:	IN STD_LOGIC;
 				CLK						:	IN STD_LOGIC;
 				SEL						:	IN STD_LOGIC;		
@@ -76,8 +76,7 @@ BEGIN
 				)
 			PORT MAP
 				(
-					DATA_IN_1 	=> DATA_BUS,
-					DATA_IN_2	=> DATA_BUS,
+					DATA_IN	 	=> DATA_BUS,
 					A_IN			=> A_IN,
 					G_IN			=> G_IN,
 					CLK			=> CLK,

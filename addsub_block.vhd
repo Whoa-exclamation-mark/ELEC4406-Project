@@ -7,7 +7,7 @@ ENTITY addsub_block IS
 				BIT_LENGTH	: 	INTEGER := 9
 		);
 	PORT(		
-				DATA_IN_1,DATA_IN_2	:	IN STD_LOGIC_VECTOR( BIT_LENGTH - 1 DOWNTO 0);
+				DATA_IN					:	IN STD_LOGIC_VECTOR( BIT_LENGTH - 1 DOWNTO 0);
 				A_IN,G_IN				:	IN STD_LOGIC;
 				CLK						:	IN STD_LOGIC;
 				SEL						:	IN STD_LOGIC;		
@@ -52,7 +52,7 @@ BEGIN
 			)
 		PORT MAP
 			(
-				DATA_IN		=>		DATA_IN_1,
+				DATA_IN		=>		DATA_IN,
 				CTRL			=>		A_IN,
 				CLK			=> 	CLK,
 				DATA_OUT		=>		A
@@ -66,7 +66,7 @@ BEGIN
 		PORT MAP
 			(
 				A => A,
-				B => DATA_IN_2,
+				B => DATA_IN,
 				SEL => SEL,
 				DATA_OUT => G
 			);
