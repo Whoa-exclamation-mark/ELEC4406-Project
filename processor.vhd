@@ -79,11 +79,10 @@ BEGIN
 		);
 		
 	alu_comp: alu
-		GENERIC MAP
-				(
-					BIT_LENGTH 	=> BIT_LENGTH,
-					REG_NUM 		=> REG_NUM
-				)
+		GENERIC MAP(
+				BIT_LENGTH 	=> BIT_LENGTH,
+				REG_NUM 		=> REG_NUM
+		)
 		PORT MAP(		
 				DIN			=> DIN,
 				G_IN			=> G_IN,
