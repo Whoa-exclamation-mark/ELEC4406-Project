@@ -15,16 +15,25 @@ END memory_block;
 
 ARCHITECTURE memory_block_rtl OF memory_block IS
 
-	COMPONENT memory 
-	GENERIC (
-				ADDR_SPACE	: 	INTEGER := 5;
-				BIT_LENGTH	:	INTEGER := 9
-			);
-	PORT (
-				ADDR			: 	IN STD_LOGIC_VECTOR(ADDR_SPACE-1 DOWNTO 0);
-				DATA_OUT		:	OUT STD_LOGIC_VECTOR(BIT_LENGTH-1 DOWNTO 0);
-				CLK			:	IN STD_LOGIC
-			);
+	--COMPONENT memory 
+	--GENERIC (
+	--			ADDR_SPACE	: 	INTEGER := 5;
+	--			BIT_LENGTH	:	INTEGER := 9
+	--		);
+	--PORT (
+	--			ADDR			: 	IN STD_LOGIC_VECTOR(ADDR_SPACE-1 DOWNTO 0);
+	--			DATA_OUT		:	OUT STD_LOGIC_VECTOR(BIT_LENGTH-1 DOWNTO 0);
+	--			CLK			:	IN STD_LOGIC
+	--		);
+	--END COMPONENT;
+	
+	COMPONENT rom
+		PORT
+		(
+			address	: IN STD_LOGIC_VECTOR (4 DOWNTO 0);
+			clock		: IN STD_LOGIC  := '1';
+			q			: OUT STD_LOGIC_VECTOR (8 DOWNTO 0)
+		);
 	END COMPONENT;
 	
 	COMPONENT counter IS
@@ -41,19 +50,25 @@ ARCHITECTURE memory_block_rtl OF memory_block IS
 	
 BEGIN
 	
-	memory_comp: memory
-		GENERIC MAP
-				(
-					ADDR_SPACE 	=> ADDR_SPACE,
-					BIT_LENGTH 	=> BIT_LENGTH
-				)
+	--memory_comp: memory
+	--	GENERIC MAP
+	--			(
+	--				ADDR_SPACE 	=> ADDR_SPACE,
+	--				BIT_LENGTH 	=> BIT_LENGTH
+	--			)
+	--	PORT MAP(
+	--			ADDR => address,
+	--			DATA_OUT => DATA_OUT,
+	--			CLK => CLK
+	--	);
+	memory_comp: rom
 		PORT MAP(
-				ADDR => address,
-				DATA_OUT => DATA_OUT,
-				CLK => CLK
+				address => address,
+				q => DATA_OUT,
+				clock => CLK
 		);
 	
-		counter_comp: counter
+	counter_comp: counter
 		GENERIC MAP
 				(
 					ADDR_SPACE 	=> ADDR_SPACE

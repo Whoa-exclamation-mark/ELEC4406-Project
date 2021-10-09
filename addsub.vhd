@@ -2,7 +2,7 @@
 LIBRARY IEEE;
 USE IEEE.std_logic_1164.all;
 -- TODO check if we can use this library
-USE IEEE.STD_LOGIC_UNSIGNED.ALL;
+USE IEEE.STD_LOGIC_SIGNED.ALL;
 
 ENTITY addsub IS 
 	GENERIC(	

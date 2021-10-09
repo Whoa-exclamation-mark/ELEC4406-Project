@@ -1,0 +1,35 @@
+# remove any IP files
+rom.vhd
+
+# remove Quartus Project items
+board/*
+db/*
+greybox_tmp/*
+incremental_db/*
+output_files/*
+rtl_work/*
+simulation/*
+timing/*
+.qsys_edit/*
+*.cmp
+*.qsys
+*.sopcinfo
+*.wlf
+*.json
+*.do
+*.rpt
+*.xrf
+*.qdf
+*.vo
+*.sft
+*.qsf
+*.qpf
+*.ini
+msim_transcript
+
+# no backup files
+*.bak*
+*.bak
+
+# we are not using verilog
+*.v
