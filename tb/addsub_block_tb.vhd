@@ -1,18 +1,18 @@
-
 LIBRARY IEEE;
 USE IEEE.std_logic_1164.all;
-use ieee.numeric_std.all;
+USE IEEE.numeric_std.all;
 
-use std.env.stop;
-use std.env.finish;
+USE STD.env.stop;
+USE STD.env.finish;
 
 ENTITY addsub_block_tb IS
 	GENERIC(	
-				BIT_LENGTH	: 	INTEGER := 9
+		BIT_LENGTH	: 	INTEGER := 9
 	);
 END addsub_block_tb;
 
 ARCHITECTURE addsub_block_tb_rtl OF addsub_block_tb IS
+
 	COMPONENT addsub_block 
 		GENERIC(	
 				BIT_LENGTH	: 	INTEGER := 9
@@ -29,7 +29,8 @@ ARCHITECTURE addsub_block_tb_rtl OF addsub_block_tb IS
 	SIGNAL DATA_IN, DATA_OUT : STD_LOGIC_VECTOR( BIT_LENGTH - 1 DOWNTO 0) := (OTHERS => '0');
 	SIGNAL A_IN, G_IN, CLK, SEL : STD_LOGIC := '0';
 	
-	constant T: time := 50 ns;
+	CONSTANT T: TIME := 50 ns;
+	
 BEGIN
 
 	CLOCK:
@@ -37,18 +38,18 @@ BEGIN
 	
 	DUT: addsub_block 
 		GENERIC MAP
-				(
-					BIT_LENGTH 	=> BIT_LENGTH
-				)
+			(
+				BIT_LENGTH 	=> BIT_LENGTH
+			)
 		PORT MAP
-				(
-					DATA_IN 		=> DATA_IN,
-					A_IN			=> A_IN,
-					G_IN			=> G_IN,
-					CLK			=> CLK,
-					SEL			=> SEL,
-					DATA_OUT		=> DATA_OUT
-				);
+			(
+				DATA_IN 		=> DATA_IN,
+				A_IN			=> A_IN,
+				G_IN			=> G_IN,
+				CLK			=> CLK,
+				SEL			=> SEL,
+				DATA_OUT		=> DATA_OUT
+			);
 	
 	tb_proc: PROCESS 
 	BEGIN
@@ -66,7 +67,7 @@ BEGIN
 		WAIT FOR T;
 		G_IN <= '0';
 		
-		ASSERT DATA_OUT /= (BIT_LENGTH-1 DOWNTO 3 => '0') & "011" REPORT "TEST 1 FAILED" SEVERITY FAILURE;
+		ASSERT DATA_OUT = (BIT_LENGTH-1 DOWNTO 3 => '0') & "011" REPORT "TEST 1 FAILED" SEVERITY NOTE;
 		
 		WAIT FOR T;
 		
@@ -83,9 +84,10 @@ BEGIN
 		WAIT FOR T;
 		G_IN <= '0';
 		
-		ASSERT DATA_OUT /= (BIT_LENGTH-1 DOWNTO 3 => '0') & "010" REPORT "TEST 1 FAILED" SEVERITY FAILURE;
+		ASSERT DATA_OUT = (BIT_LENGTH-1 DOWNTO 3 => '0') & "010" REPORT "TEST 1 FAILED" SEVERITY NOTE;
 		
 		stop;
 		finish;
 	END PROCESS;
+	
 END addsub_block_tb_rtl;

@@ -26,6 +26,9 @@ timing/*
 *.qpf
 *.ini
 msim_transcript
+tb_out.txt
+waves/*
+tb_out/*
 
 # no backup files
 *.bak*

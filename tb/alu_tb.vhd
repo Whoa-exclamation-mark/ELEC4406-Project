@@ -1,0 +1,77 @@
+LIBRARY IEEE;
+USE IEEE.std_logic_1164.all;
+USE IEEE.numeric_std.all;
+
+USE STD.env.stop;
+USE STD.env.finish;
+
+ENTITY alu_tb IS
+	GENERIC(	
+		BIT_LENGTH	: 	INTEGER := 9;
+		REG_NUM		:	INTEGER := 8
+	);
+END alu_tb;
+
+ARCHITECTURE alu_tb_rtl OF alu_tb IS
+
+	COMPONENT alu IS 
+		GENERIC(	
+				BIT_LENGTH	: 	INTEGER := 9;
+				REG_NUM		:	INTEGER := 8
+		);
+		PORT(		
+				DIN							:	IN STD_LOGIC_VECTOR( BIT_LENGTH - 1 DOWNTO 0);
+				G_IN,G_OUT,A_IN,DIN_OUT	:	IN STD_LOGIC;
+				R_IN							: 	IN STD_LOGIC_VECTOR( REG_NUM - 1 DOWNTO 0);
+				R_OUT							:	IN INTEGER;
+				ADDSUB						:	IN STD_LOGIC;	
+				CLK							:	IN STD_LOGIC;
+				DATA_OUT						:	OUT STD_LOGIC_VECTOR( BIT_LENGTH - 1 DOWNTO 0)
+		);
+	END COMPONENT;
+	
+	SIGNAL DIN			:	STD_LOGIC_VECTOR( BIT_LENGTH - 1 DOWNTO 0);
+	SIGNAL G_IN			:	STD_LOGIC;
+	SIGNAL G_OUT		:	STD_LOGIC;
+	SIGNAL A_IN			:	STD_LOGIC;
+	SIGNAL DIN_OUT		:	STD_LOGIC;
+	SIGNAL R_IN			:	STD_LOGIC_VECTOR( REG_NUM - 1 DOWNTO 0);
+	SIGNAL R_OUT		:	INTEGER;
+	SIGNAL ADDSUB		:	STD_LOGIC;	
+	SIGNAL CLK			:	STD_LOGIC;
+	SIGNAL DATA_OUT	:	STD_LOGIC_VECTOR( BIT_LENGTH - 1 DOWNTO 0);
+	
+	CONSTANT T: TIME := 50 ns;
+	
+BEGIN
+
+	CLOCK:
+		CLK <=  not CLK after T/2;
+	
+	DUT: alu
+		GENERIC MAP (	
+				BIT_LENGTH	=> BIT_LENGTH,
+				REG_NUM		=> REG_NUM
+		)
+		PORT MAP (		
+				DIN			=>	DIN,
+				G_IN			=>	G_IN,
+				G_OUT			=> G_OUT,
+				A_IN			=>	A_IN,
+				DIN_OUT		=>	DIN_OUT,
+				R_IN			=>	R_IN,
+				R_OUT			=> R_OUT,
+				ADDSUB		=>	ADDSUB,
+				CLK			=>	CLK,
+				DATA_OUT		=> DATA_OUT
+		);
+		
+	tb_proc: PROCESS
+	BEGIN
+		WAIT FOR T;
+		
+		stop;
+		finish;
+	END PROCESS;
+
+END alu_tb_rtl;
