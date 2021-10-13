@@ -25,9 +25,9 @@ ARCHITECTURE memory_block_tb_rtl OF memory_block_tb IS
 			);
 	END COMPONENT;
 	
-	SIGNAL DATA_OUT	: STD_LOGIC_VECTOR(BIT_LENGTH-1 DOWNTO 0);
-	SIGNAL CLK			: STD_LOGIC;
-	SIGNAL RST			: STD_LOGIC;
+	SIGNAL DATA_OUT	: STD_LOGIC_VECTOR(BIT_LENGTH-1 DOWNTO 0) := (OTHERS => '0');
+	SIGNAL CLK			: STD_LOGIC := '0';
+	SIGNAL RST			: STD_LOGIC := '0';
 
 	CONSTANT T: TIME := 50 ns;
 	
@@ -49,7 +49,34 @@ BEGIN
 		
 	tb_proc: PROCESS
 	BEGIN
+		WAIT FOR 1 ps;
+		-- Starts at blank
+		ASSERT DATA_OUT = (BIT_LENGTH - 1 DOWNTO 0 => '0') REPORT "TEST 1 FAILED" SEVERITY NOTE;
+		
+		-- Test first memory cell
 		WAIT FOR T;
+		ASSERT DATA_OUT = (BIT_LENGTH - 1 DOWNTO 2 => '0') & "01" REPORT "TEST 2 FAILED" SEVERITY NOTE;
+		
+		-- Test second memory cell
+		WAIT FOR T;
+		ASSERT DATA_OUT = (BIT_LENGTH - 1 DOWNTO 2 => '0') & "11" REPORT "TEST 3 FAILED" SEVERITY NOTE;
+		
+		-- Test reset memory cell
+		WAIT FOR T;
+		RST <= '1';
+		WAIT FOR 1 ps;
+		RST <= '0';
+		WAIT FOR 1 ps;
+		-- it is sync from the memory def
+		ASSERT DATA_OUT = (BIT_LENGTH - 1 DOWNTO 4 => '0') & "1001" REPORT "TEST 4 FAILED" SEVERITY NOTE;
+		
+		-- Test reset memory cell / 1st memory cell
+		WAIT FOR T;
+		ASSERT DATA_OUT = (BIT_LENGTH - 1 DOWNTO 2 => '0') & "01" REPORT "TEST 5 FAILED" SEVERITY NOTE;
+		
+		-- Test reset memory cell / 2nd memory cell
+		WAIT FOR T;
+		ASSERT DATA_OUT = (BIT_LENGTH - 1 DOWNTO 2 => '0') & "11" REPORT "TEST 5 FAILED" SEVERITY NOTE;
 		
 		stop;
 		finish;

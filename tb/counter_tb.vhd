@@ -7,7 +7,7 @@ USE STD.env.finish;
 
 ENTITY counter_tb IS
 	GENERIC (
-		ADDR_SPACE	: 	INTEGER := 5
+		ADDR_SPACE	: 	INTEGER := 4
 	);
 END counter_tb;
 
@@ -24,8 +24,8 @@ ARCHITECTURE counter_tb_rtl OF counter_tb IS
 	END COMPONENT;
 	
 	SIGNAL ADDR		: STD_LOGIC_VECTOR(ADDR_SPACE-1 DOWNTO 0);
-	SIGNAL CLK		: STD_LOGIC;
-	SIGNAL RST		: STD_LOGIC;
+	SIGNAL CLK		: STD_LOGIC := '0';
+	SIGNAL RST		: STD_LOGIC := '0';
 	
 	CONSTANT T: TIME := 50 ns;
 	
@@ -46,7 +46,20 @@ BEGIN
 		
 	tb_proc: PROCESS
 	BEGIN
-		WAIT FOR T;
+		WAIT FOR 3*T;
+		
+		-- Check if increments correctly
+		ASSERT ADDR = (ADDR_SPACE-1 DOWNTO 2 => '0') & "11" REPORT "TEST 1 FAILED" SEVERITY NOTE;
+		
+		-- Check reset
+		RST <= '1';
+		WAIT FOR 5 ps;
+		RST <= '0';
+		ASSERT ADDR = (ADDR_SPACE-1 DOWNTO 2 => '0') & "00" REPORT "TEST 2 FAILED" SEVERITY NOTE;
+		
+		-- Check roll over
+		WAIT FOR (2**ADDR_SPACE+1)*T;
+		ASSERT ADDR = (ADDR_SPACE-1 DOWNTO 2 => '0') & "01" REPORT "TEST 3 FAILED" SEVERITY NOTE;
 		
 		stop;
 		finish;

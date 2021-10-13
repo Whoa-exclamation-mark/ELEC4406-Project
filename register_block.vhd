@@ -11,7 +11,7 @@ ENTITY register_block IS
 				DATA_IN		:	IN STD_LOGIC_VECTOR( BIT_LENGTH - 1 DOWNTO 0);
 				CTRL			: 	IN STD_LOGIC_VECTOR( REG_NUM - 1 DOWNTO 0);
 				CLK			:	IN STD_LOGIC;
-				SEL			:	IN INTEGER;
+				SEL			:	IN NATURAL RANGE 0 to REG_NUM-1 := 0;
 				--SEL			:	IN STD_LOGIC_VECTOR( REG_NUM - 1 DOWNTO 0); 
 				DATA_OUT		:	OUT STD_LOGIC_VECTOR( BIT_LENGTH - 1 DOWNTO 0)
 		);
@@ -34,7 +34,7 @@ ARCHITECTURE register_block_rtl OF register_block IS
 	-- TODO: Think about a better way of doing this...
 	TYPE Q_OUT IS ARRAY (0 to REG_NUM-1) of std_logic_vector(BIT_LENGTH-1 DOWNTO 0);
 	SIGNAL DATA_OUT_INT : Q_OUT;
-	SIGNAL SEL_INT : INTEGER := 0;
+	SIGNAL SEL_INT : NATURAL RANGE 0 to REG_NUM-1 := 0;
 	
 BEGIN
 	

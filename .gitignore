@@ -29,6 +29,14 @@ msim_transcript
 tb_out.txt
 waves/*
 tb_out/*
+library/*
+lpm/*
+sgate/*
+altera/*
+altera_mf/*
+altgxb/*
+*.pdf
+
 
 # no backup files
 *.bak*

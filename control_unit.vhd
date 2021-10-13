@@ -1,25 +1,24 @@
-
-
 LIBRARY IEEE;
 USE IEEE.std_logic_1164.all;
 USE ieee.numeric_std.ALL;
 
 ENTITY control_unit IS
 	GENERIC(	
-				BIT_LENGTH	: 	INTEGER := 9;
-				REG_NUM		:	INTEGER := 8
-		);
+		BIT_LENGTH	: 	INTEGER := 9;
+		REG_NUM		:	INTEGER := 8
+	);
 	PORT(		
-				G_IN,G_OUT,A_IN,DIN_OUT	:	OUT STD_LOGIC;
-				R_IN							: 	OUT STD_LOGIC_VECTOR( REG_NUM - 1 DOWNTO 0);
-				R_OUT							:	OUT INTEGER;
-				ADDSUB						:	OUT STD_LOGIC;	
-				CLK							:	IN STD_LOGIC;
-				RUN_SIG						:	IN STD_LOGIC;
-				RESETN						:	IN STD_LOGIC;
-				DONE							: 	OUT STD_LOGIC;
-				DIN							:	IN STD_LOGIC_VECTOR( BIT_LENGTH-1 DOWNTO 0)
-		);
+		G_IN,G_OUT,A_IN,DIN_OUT	:	OUT STD_LOGIC;
+		R_IN							: 	OUT STD_LOGIC_VECTOR( REG_NUM - 1 DOWNTO 0);
+		R_OUT							:	OUT NATURAL RANGE 0 to REG_NUM  := 1;
+		ADDSUB						:	OUT STD_LOGIC;	
+		CLK							:	IN STD_LOGIC;
+		RUN_SIG						:	IN STD_LOGIC;
+		RESETN						:	IN STD_LOGIC;
+		DONE							: 	OUT STD_LOGIC;
+		DIN							:	IN STD_LOGIC_VECTOR( BIT_LENGTH-1 DOWNTO 0);
+		STATE_VAL					:  OUT STD_LOGIC_VECTOR( 3 DOWNTO 0)
+	);
 END control_unit;
 
 
@@ -27,20 +26,21 @@ ARCHITECTURE control_unit_rtl OF control_unit IS
 
 	COMPONENT register_parallel 
 		GENERIC(	
-				BIT_LENGTH	: 	INTEGER := 9
+			BIT_LENGTH	: 	INTEGER := 9
 		);
 		PORT(		
-				DATA_IN		:	IN STD_LOGIC_VECTOR( BIT_LENGTH - 1 DOWNTO 0);
-				CTRL			: 	IN STD_LOGIC;
-				CLK			:	IN STD_LOGIC;
-				DATA_OUT		:	OUT STD_LOGIC_VECTOR( BIT_LENGTH - 1 DOWNTO 0)
+			DATA_IN		:	IN STD_LOGIC_VECTOR( BIT_LENGTH - 1 DOWNTO 0);
+			CTRL			: 	IN STD_LOGIC;
+			CLK			:	IN STD_LOGIC;
+			DATA_OUT		:	OUT STD_LOGIC_VECTOR( BIT_LENGTH - 1 DOWNTO 0)
 		);
 	END COMPONENT;
-
-	TYPE STATE IS (RUN, MV_T1, MVI_T1, ADD_T1, ADD_T2, ADD_T3, SUB_T1, SUB_T2, SUB_T3);
+	
+	TYPE STATE IS (T0, T1, T2, T3);
 	SIGNAL LS, NS : STATE;
 	SIGNAL IR_IN : STD_LOGIC;
 	SIGNAL IR_DATA : STD_LOGIC_VECTOR( BIT_LENGTH-1 DOWNTO 0);
+
 BEGIN
 
 	ir_reg: register_parallel
@@ -59,8 +59,9 @@ BEGIN
 	clk_proc: 
 		PROCESS (CLK, RESETN) BEGIN
 			IF (RESETN = '1') THEN
-				LS <= RUN;
-			ELSIF (CLK'EVENT AND CLK = '1') THEN
+				LS <= T0;
+			-- TODO check if this is okay
+			ELSIF (CLK'EVENT AND CLK = '1' AND RUN_SIG = '1') THEN
 				LS <= NS;
 			END IF;
 		END PROCESS;
@@ -80,92 +81,80 @@ BEGIN
 			IR_IN <= '0';
 			R_OUT <= 0;
 			R_IN <= (OTHERS => '0');
-			x := IR_DATA(5 DOWNTO 3);
-			y := IR_DATA(8 DOWNTO 6);
 			CASE (LS) IS 
-				WHEN RUN =>
+				WHEN T0 =>
 					IR_IN <= '1';
-					instruction := IR_DATA(2 DOWNTO 0);
-					IF (RUN_SIG = '1') THEN
-						CASE (instruction) IS
-							WHEN "000" => --mv
-								NS <= MV_T1;
-							WHEN "001" => --mvi
-								NS <= MVI_T1;
-							WHEN "010" => --add
-								NS <= ADD_T1;
-							WHEN "011" => --mv
-								NS <= SUB_T1;
-							WHEN OTHERS => --invalid state
-								NS <= RUN;
-						END CASE;
-					ELSE
-						NS <= RUN;
+					NS <= T1;
+				WHEN T1 =>
+					CASE (IR_DATA(2 DOWNTO 0)) IS
+						WHEN "000" => --mv
+							R_OUT <= to_integer(unsigned(IR_DATA(8 DOWNTO 6)))+1;
+							FOR I IN 0 TO REG_NUM-1 LOOP
+								IF (I = to_integer(unsigned(IR_DATA(5 DOWNTO 3)))) THEN
+									R_IN(I) <= '1';
+								ELSE 
+									R_IN(I) <= '0';
+								END IF;
+							END LOOP;
+							DONE <= '1';
+							NS <= T0;
+						WHEN "001" => --mvi
+							DIN_OUT <= '1';
+							FOR I IN 0 TO REG_NUM-1 LOOP
+								IF (I = to_integer(unsigned(IR_DATA(5 DOWNTO 3)))) THEN
+									R_IN(I) <= '1';
+								ELSE 
+									R_IN(I) <= '0';
+								END IF;
+							END LOOP;
+							DONE <= '1';
+							NS <= T0;
+						WHEN "010" => --add
+							R_OUT <= to_integer(unsigned(IR_DATA(5 DOWNTO 3)))+1;
+							A_IN <= '1';
+							NS <= T2;
+						WHEN "011" => --mv
+							R_OUT <= to_integer(unsigned(IR_DATA(5 DOWNTO 3)))+1;
+							A_IN <= '1';
+							NS <= T2;
+						WHEN OTHERS => --invalid state
+							DONE <= '1';
+							NS <= T0;
+					END CASE;
+				WHEN T2 =>
+					CASE (IR_DATA(2 DOWNTO 0)) IS
+						WHEN "010" =>
+							R_OUT <= to_integer(unsigned(IR_DATA(8 DOWNTO 6)))+1;
+							G_IN <= '1';
+							NS <= T3;
+						WHEN "011" =>
+							R_OUT <= to_integer(unsigned(IR_DATA(8 DOWNTO 6)))+1;
+							G_IN <= '1';
+							ADDSUB <= '1';
+							NS <= T3;
+						WHEN OTHERS =>
+							DONE <= '1';
+							NS <= T0;
+					END CASE;
+				WHEN T3 =>
+					IF (IR_DATA(2 DOWNTO 0) = "010" OR IR_DATA(2 DOWNTO 0) = "011") THEN
+						G_OUT <= '1';
+						FOR I IN 0 TO REG_NUM-1 LOOP
+							IF (I = to_integer(unsigned(IR_DATA(5 DOWNTO 3)))) THEN
+								R_IN(I) <= '1';
+							ELSE 
+								R_IN(I) <= '0';
+							END IF;
+						END LOOP;
+						DONE <= '1';
+						NS <= T0;
+					ELSE 
+						DONE <= '1';
+						NS <= T0;
 					END IF;
-				WHEN MV_T1 =>
-					R_OUT <= to_integer(unsigned(y))+1;
-					R_IN <= (OTHERS => '0');
-					FOR I IN 0 TO REG_NUM-1 LOOP
-						IF (I = to_integer(unsigned(x))) THEN
-							R_IN(I) <= '1';
-						ELSE 
-							R_IN(I) <= '0';
-						END IF;
-					END LOOP;
-					DONE <= '1';
-					NS <= RUN;
-				WHEN MVI_T1 =>
-					DIN_OUT <= '1';
-					FOR I IN 0 TO REG_NUM-1 LOOP
-						IF (I = to_integer(unsigned(x))) THEN
-							R_IN(I) <= '1';
-						ELSE 
-							R_IN(I) <= '0';
-						END IF;
-					END LOOP;
-					DONE <= '1';
-					NS <= RUN;
-				WHEN ADD_T1 =>
-					R_OUT <= to_integer(unsigned(x))+1;
-					A_IN <= '1';
-					NS <= ADD_T2;
-				WHEN ADD_T2 =>
-					R_OUT <= to_integer(unsigned(y))+1;
-					G_IN <= '1';
-					NS <= ADD_T3;
-				WHEN ADD_T3 =>
-					G_OUT <= '1';
-					FOR I IN 0 TO REG_NUM-1 LOOP
-						IF (I = to_integer(unsigned(x))) THEN
-							R_IN(I) <= '1';
-						ELSE 
-							R_IN(I) <= '0';
-						END IF;
-					END LOOP;
-					DONE <= '1';
-					NS <= RUN;
-				WHEN SUB_T1 =>
-					R_OUT <= to_integer(unsigned(x))+1;
-					A_IN <= '1';
-					NS <= SUB_T2;
-				WHEN SUB_T2 =>
-					R_OUT <= to_integer(unsigned(y))+1;
-					G_IN <= '1';
-					ADDSUB <= '1';
-					NS <= SUB_T3;
-				WHEN SUB_T3 =>
-					G_OUT <= '1';
-					FOR I IN 0 TO REG_NUM-1 LOOP
-						IF (I = to_integer(unsigned(x))) THEN
-							R_IN(I) <= '1';
-						ELSE 
-							R_IN(I) <= '0';
-						END IF;
-					END LOOP;
-					DONE <= '1';
-					NS <= RUN;
 				WHEN OTHERS =>
-					NS <= RUN;
+					NS <= T0;
 			END CASE;
 		END PROCESS;
+		
 END control_unit_rtl;

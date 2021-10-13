@@ -11,7 +11,7 @@ ENTITY alu IS
 				DIN							:	IN STD_LOGIC_VECTOR( BIT_LENGTH - 1 DOWNTO 0);
 				G_IN,G_OUT,A_IN,DIN_OUT	:	IN STD_LOGIC;
 				R_IN							: 	IN STD_LOGIC_VECTOR( REG_NUM - 1 DOWNTO 0);
-				R_OUT							:	IN INTEGER;
+				R_OUT							:	IN NATURAL RANGE 0 to REG_NUM := 1;
 				ADDSUB						:	IN STD_LOGIC;	
 				CLK							:	IN STD_LOGIC;
 				DATA_OUT						:	OUT STD_LOGIC_VECTOR( BIT_LENGTH - 1 DOWNTO 0)
@@ -29,7 +29,7 @@ ARCHITECTURE alu_rlt OF alu IS
 				DATA_IN		:	IN STD_LOGIC_VECTOR( BIT_LENGTH - 1 DOWNTO 0);
 				CTRL			: 	IN STD_LOGIC_VECTOR( REG_NUM - 1 DOWNTO 0);
 				CLK			:	IN STD_LOGIC;
-				SEL			:	IN INTEGER;
+				SEL			:	IN NATURAL RANGE 0 to REG_NUM-1;
 				DATA_OUT		:	OUT STD_LOGIC_VECTOR( BIT_LENGTH - 1 DOWNTO 0)
 		);
 	END COMPONENT;
@@ -50,8 +50,11 @@ ARCHITECTURE alu_rlt OF alu IS
 	SIGNAL DATA_BUS : STD_LOGIC_VECTOR( BIT_LENGTH - 1 DOWNTO 0) := (OTHERS => '0');
 	SIGNAL REG_OUT : STD_LOGIC_VECTOR( BIT_LENGTH - 1 DOWNTO 0) := (OTHERS => '0');
 	SIGNAL ADDSUB_OUT : STD_LOGIC_VECTOR( BIT_LENGTH - 1 DOWNTO 0) := (OTHERS => '0');
+	SIGNAL R_OUT_SIG : NATURAL RANGE 0 to REG_NUM-1 := 0;
 	
 BEGIN
+		
+		R_OUT_SIG <= R_OUT-1 WHEN R_OUT > 0 AND R_OUT < REG_NUM ELSE 0;
 		
 		register_block_comp: register_block
 			GENERIC MAP
@@ -65,7 +68,7 @@ BEGIN
 					CTRL 			=> R_IN,
 					CLK 			=> CLK,
 					-- Minus one to start at index of 0 (0 in the ALU means no control)
-					SEL 			=> R_OUT-1,
+					SEL 			=> R_OUT_SIG,
 					DATA_OUT		=> REG_OUT
 				);
 		
@@ -90,7 +93,7 @@ BEGIN
 					DATA_BUS <= DIN;
 				ELSIF (G_OUT = '1') THEN 
 					DATA_BUS <= ADDSUB_OUT;
-				ELSIF (R_OUT > 0) THEN
+				ELSIF (R_OUT >= 1) THEN
 					DATA_BUS <= REG_OUT;
 				ELSE
 					-- Illegal state 

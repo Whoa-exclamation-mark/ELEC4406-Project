@@ -18,4 +18,4 @@ foreach f $tb_files {
 	wlf2vcd -o waves/$tb_name.vcd waves/$tb_name.wlf
 }
 
-exit
+exit -force
