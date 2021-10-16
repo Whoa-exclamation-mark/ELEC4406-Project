@@ -46,9 +46,12 @@ ARCHITECTURE processor_memory_rtl OF processor_memory IS
 	END COMPONENT;
 	
 	SIGNAL DIN : STD_LOGIC_VECTOR(8 DOWNTO 0);
+	SIGNAL KEY_NOT : STD_LOGIC_VECTOR(1 DOWNTO 0);
 	
 BEGIN
-
+	
+	KEY_NOT <= NOT(KEY);
+	
 	processor_comp: processor
 		GENERIC MAP
 				(
@@ -56,7 +59,7 @@ BEGIN
 					REG_NUM 		=> 8
 				)
 		PORT MAP(
-				CLK => NOT(KEY(1)),
+				CLK => KEY_NOT(1),
 				RUN => SW(9),
 				RESETN => SW(0),
 				DONE => LEDR(9),
@@ -72,23 +75,7 @@ BEGIN
 				)
 		PORT MAP(
 				DATA_OUT => DIN,
-				CLK => NOT(KEY(0)), 
+				CLK => KEY_NOT(0), 
 				RST => SW(0)
 		);
-		
-	seg0: seven_segment_decoder
-		PORT MAP(
-				SW => "0" & DIN(2 DOWNTO 0),
-				HEX => HEX0);
-	
-	seg1: seven_segment_decoder
-		PORT MAP(
-				SW => "0" & DIN(5 DOWNTO 3),
-				HEX => HEX1);
-	
-	seg2: seven_segment_decoder
-		PORT MAP(
-				SW => "0" & DIN(8 DOWNTO 6),
-				HEX => HEX2);
-	
 END processor_memory_rtl;

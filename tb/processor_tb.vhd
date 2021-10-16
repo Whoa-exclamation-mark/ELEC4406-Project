@@ -65,30 +65,59 @@ BEGIN
 		DIN <= "000000001";
 		WAIT FOR T;
 		DIN <= "000100011";
-		WAIT FOR T;
+		-- check if DIN is connected to bus
+		WAIT FOR 5 ps;
+		ASSERT DATA_OUT = "000100011" REPORT "DIN not set as bus" SEVERITY NOTE;
+		ASSERT DONE = '1' REPORT "Done not asserted" SEVERITY NOTE;
+		WAIT FOR T - 5 ps;
+		
+		
 		-- See if invalid y effects results
 		DIN <= "011010001";
 		WAIT FOR T;
 		DIN <= "000001001";
-		WAIT FOR T;
+		WAIT FOR 5 ps;
+		ASSERT DATA_OUT = "000001001" REPORT "DIN not set as bus" SEVERITY NOTE;
+		ASSERT DONE = '1' REPORT "Done not asserted" SEVERITY NOTE;
+		WAIT FOR T - 5 ps;
 		
 		-- Test MV
-		DIN <= "001000000";
-		WAIT FOR 2*T;
-		DIN <= "100001000";
-		WAIT FOR 2*T;
+		DIN <= "000001000";
+		WAIT FOR T;
+		WAIT FOR 5 ps;
+		ASSERT DATA_OUT = "000100011" REPORT "R0 not set as bus" SEVERITY NOTE;
+		ASSERT DONE = '1' REPORT "Done not asserted" SEVERITY NOTE;
+		WAIT FOR T - 5 ps;
+
+		DIN <= "001100000";
+		WAIT FOR T;
+		WAIT FOR 5 ps;
+		ASSERT DATA_OUT = "000100011" REPORT "R1 not set as bus" SEVERITY NOTE;
+		ASSERT DONE = '1' REPORT "Done not asserted" SEVERITY NOTE;
+		WAIT FOR T - 5 ps;
+		
 		
 		-- Test ADD
 		DIN <= "000100010";
-		WAIT FOR 4*T;
-		DIN <= "100010010";
-		WAIT FOR 4*T;
+		WAIT FOR 3*T;
 		
-		-- Test ADD
+		DIN <= "100100000";
+		WAIT FOR 2*T;
+		WAIT FOR 5 ps;
+		ASSERT DATA_OUT = "001000110" REPORT "Addition of same number did not result in 2x" SEVERITY NOTE;
+		ASSERT DONE = '1' REPORT "Done not asserted" SEVERITY NOTE;
+		WAIT FOR T - 5 ps;
+		
+		-- Test SUB
 		DIN <= "000100011";
-		WAIT FOR 4*T;
-		DIN <= "100010011";
-		WAIT FOR 4*T;
+		WAIT FOR 3*T;
+		
+		DIN <= "100100000";
+		WAIT FOR 2*T;
+		WAIT FOR 5 ps;
+		ASSERT DATA_OUT = "000100011" REPORT "Subtraction of 2x with itself did not result in 1x" SEVERITY NOTE;
+		ASSERT DONE = '1' REPORT "Done not asserted" SEVERITY NOTE;
+		WAIT FOR T - 5 ps;
 		
 		stop;
 		finish;

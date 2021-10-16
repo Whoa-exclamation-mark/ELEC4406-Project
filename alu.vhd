@@ -88,7 +88,7 @@ BEGIN
 				);
 				
 		mux_proc:
-			PROCESS (G_OUT,DIN_OUT,R_OUT) BEGIN
+			PROCESS (G_OUT,DIN_OUT,R_OUT, DIN, ADDSUB_OUT, REG_OUT) BEGIN
 				IF (DIN_OUT = '1') THEN
 					DATA_BUS <= DIN;
 				ELSIF (G_OUT = '1') THEN 

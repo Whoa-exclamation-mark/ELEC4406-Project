@@ -67,9 +67,6 @@ BEGIN
 	
 	comb_proc:
 		PROCESS(LS, NS) 
-			VARIABLE instruction : STD_LOGIC_VECTOR( 2 DOWNTO 0);
-			VARIABLE x : STD_LOGIC_VECTOR(2 DOWNTO 0);
-			VARIABLE y : STD_LOGIC_VECTOR(2 DOWNTO 0);
 		BEGIN
 			G_IN <= '0';
 			G_OUT <= '0';
