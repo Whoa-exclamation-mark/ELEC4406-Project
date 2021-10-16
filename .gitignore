@@ -1,5 +1,5 @@
 # remove any IP files
-rom.vhd
+
 
 # remove Quartus Project items
 board/*
@@ -36,6 +36,8 @@ altera/*
 altera_mf/*
 altgxb/*
 *.pdf
+*.vho
+*.qws
 
 
 # no backup files

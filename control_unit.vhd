@@ -21,7 +21,6 @@ ENTITY control_unit IS
 	);
 END control_unit;
 
-
 ARCHITECTURE control_unit_rtl OF control_unit IS
 
 	COMPONENT register_parallel 
