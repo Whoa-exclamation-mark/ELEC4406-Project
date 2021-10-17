@@ -75,32 +75,321 @@ BEGIN
 	tb_proc: PROCESS
 	BEGIN
 		WAIT FOR T;
+		ASSERT 
+			G_IN = '0' AND
+			G_OUT = '0' AND
+			A_IN = '0' AND
+			DIN_OUT = '0' AND 
+			R_IN = "00000000" AND
+			R_OUT = 0 AND
+			ADDSUB = '0' AND
+			DONE = '0'
+			REPORT "CU is operating at a blank state" SEVERITY NOTE;
 		RUN_SIG <= '1';
 		
 		-- Test MV
 		DIN <= "011001000";
-		WAIT FOR 2*T;
+		WAIT FOR T;
+		ASSERT 
+			G_IN = '0' AND
+			G_OUT = '0' AND
+			A_IN = '0' AND
+			DIN_OUT = '0' AND 
+			R_IN = "00000010" AND
+			R_OUT = 4 AND
+			ADDSUB = '0' AND
+			DONE = '1'
+			REPORT "CU is not performing move correctly" SEVERITY NOTE;
+		WAIT FOR T;
+		ASSERT 
+			G_IN = '0' AND
+			G_OUT = '0' AND
+			A_IN = '0' AND
+			DIN_OUT = '0' AND 
+			R_IN = "00000000" AND
+			R_OUT = 0 AND
+			ADDSUB = '0' AND
+			DONE = '0'
+			REPORT "CU is not resetting" SEVERITY NOTE;
+		
 		DIN <= "001010000";
-		WAIT FOR 2*T;
+		WAIT FOR T;
+		ASSERT 
+			G_IN = '0' AND
+			G_OUT = '0' AND
+			A_IN = '0' AND
+			DIN_OUT = '0' AND 
+			R_IN = "00000100" AND
+			R_OUT = 2 AND
+			ADDSUB = '0' AND
+			DONE = '1'
+			REPORT "CU is not performing move correctly" SEVERITY NOTE;
+		WAIT FOR T;
+		ASSERT 
+			G_IN = '0' AND
+			G_OUT = '0' AND
+			A_IN = '0' AND
+			DIN_OUT = '0' AND 
+			R_IN = "00000000" AND
+			R_OUT = 0 AND
+			ADDSUB = '0' AND
+			DONE = '0'
+			REPORT "CU is not resetting" SEVERITY NOTE;
 		
 		-- Test MVI
 		DIN <= "000000001";
-		WAIT FOR 2*T;
+		WAIT FOR T;
+		ASSERT 
+			G_IN = '0' AND
+			G_OUT = '0' AND
+			A_IN = '0' AND
+			DIN_OUT = '1' AND 
+			R_IN = "00000001" AND
+			R_OUT = 0 AND
+			ADDSUB = '0' AND
+			DONE = '1'
+			REPORT "CU is not performing mvi correctly" SEVERITY NOTE;
+		WAIT FOR T;
+		ASSERT 
+			G_IN = '0' AND
+			G_OUT = '0' AND
+			A_IN = '0' AND
+			DIN_OUT = '0' AND 
+			R_IN = "00000000" AND
+			R_OUT = 0 AND
+			ADDSUB = '0' AND
+			DONE = '0'
+			REPORT "CU is not resetting" SEVERITY NOTE;
+		
 		-- See if invalid y effects results
 		DIN <= "011010001";
-		WAIT FOR 2*T;
+		WAIT FOR T;
+		ASSERT 
+			G_IN = '0' AND
+			G_OUT = '0' AND
+			A_IN = '0' AND
+			DIN_OUT = '1' AND 
+			R_IN = "00000100" AND
+			R_OUT = 0 AND
+			ADDSUB = '0' AND
+			DONE = '1'
+			REPORT "CU is not performing mvi correctly" SEVERITY NOTE;
+		WAIT FOR T;
+		ASSERT 
+			G_IN = '0' AND
+			G_OUT = '0' AND
+			A_IN = '0' AND
+			DIN_OUT = '0' AND 
+			R_IN = "00000000" AND
+			R_OUT = 0 AND
+			ADDSUB = '0' AND
+			DONE = '0'
+			REPORT "CU is not resetting" SEVERITY NOTE;
 		
 		-- Test ADD
 		DIN <= "011001010";
-		WAIT FOR 4*T;
+		WAIT FOR T;
+		ASSERT 
+			G_IN = '0' AND
+			G_OUT = '0' AND
+			A_IN = '1' AND
+			DIN_OUT = '0' AND 
+			R_IN = "00000000" AND
+			R_OUT = 2 AND
+			ADDSUB = '0' AND
+			DONE = '0'
+			REPORT "CU is not moving into adder REG A" SEVERITY NOTE;
+		WAIT FOR T;
+		ASSERT 
+			G_IN = '1' AND
+			G_OUT = '0' AND
+			A_IN = '0' AND
+			DIN_OUT = '0' AND 
+			R_IN = "00000000" AND
+			R_OUT = 4 AND
+			ADDSUB = '0' AND
+			DONE = '0'
+			REPORT "CU is not moving into adder REG G" SEVERITY NOTE;
+		WAIT FOR T;
+		ASSERT 
+			G_IN = '0' AND
+			G_OUT = '1' AND
+			A_IN = '0' AND
+			DIN_OUT = '0' AND 
+			R_IN = "00000010" AND
+			R_OUT = 0 AND
+			ADDSUB = '0' AND
+			DONE = '1'
+			REPORT "CU is not moving result of adder into register" SEVERITY NOTE;
+		WAIT FOR T;
+		ASSERT 
+			G_IN = '0' AND
+			G_OUT = '0' AND
+			A_IN = '0' AND
+			DIN_OUT = '0' AND 
+			R_IN = "00000000" AND
+			R_OUT = 0 AND
+			ADDSUB = '0' AND
+			DONE = '0'
+			REPORT "CU is not resetting" SEVERITY NOTE;
+		
+			
 		DIN <= "011010010";
-		WAIT FOR 4*T;
+		WAIT FOR T;
+		ASSERT 
+			G_IN = '0' AND
+			G_OUT = '0' AND
+			A_IN = '1' AND
+			DIN_OUT = '0' AND 
+			R_IN = "00000000" AND
+			R_OUT = 3 AND
+			ADDSUB = '0' AND
+			DONE = '0'
+			REPORT "CU is not moving into adder REG A" SEVERITY NOTE;
+		WAIT FOR T;
+		ASSERT 
+			G_IN = '1' AND
+			G_OUT = '0' AND
+			A_IN = '0' AND
+			DIN_OUT = '0' AND 
+			R_IN = "00000000" AND
+			R_OUT = 4 AND
+			ADDSUB = '0' AND
+			DONE = '0'
+			REPORT "CU is not moving into adder REG G" SEVERITY NOTE;
+		WAIT FOR T;
+		ASSERT 
+			G_IN = '0' AND
+			G_OUT = '1' AND
+			A_IN = '0' AND
+			DIN_OUT = '0' AND 
+			R_IN = "00000100" AND
+			R_OUT = 0 AND
+			ADDSUB = '0' AND
+			DONE = '1'
+			REPORT "CU is not moving result of adder into register" SEVERITY NOTE;
+		WAIT FOR T;
+		ASSERT 
+			G_IN = '0' AND
+			G_OUT = '0' AND
+			A_IN = '0' AND
+			DIN_OUT = '0' AND 
+			R_IN = "00000000" AND
+			R_OUT = 0 AND
+			ADDSUB = '0' AND
+			DONE = '0'
+			REPORT "CU is not resetting" SEVERITY NOTE;
 		
 		-- Test SUB
 		DIN <= "011001011";
-		WAIT FOR 4*T;
+		WAIT FOR T;
+		ASSERT 
+			G_IN = '0' AND
+			G_OUT = '0' AND
+			A_IN = '1' AND
+			DIN_OUT = '0' AND 
+			R_IN = "00000000" AND
+			R_OUT = 2 AND
+			ADDSUB = '0' AND
+			DONE = '0'
+			REPORT "CU is not moving into sub REG A" SEVERITY NOTE;
+		WAIT FOR T;
+		ASSERT 
+			G_IN = '1' AND
+			G_OUT = '0' AND
+			A_IN = '0' AND
+			DIN_OUT = '0' AND 
+			R_IN = "00000000" AND
+			R_OUT = 4 AND
+			ADDSUB = '1' AND
+			DONE = '0'
+			REPORT "CU is not moving into sub REG G" SEVERITY NOTE;
+		WAIT FOR T;
+		ASSERT 
+			G_IN = '0' AND
+			G_OUT = '1' AND
+			A_IN = '0' AND
+			DIN_OUT = '0' AND 
+			R_IN = "00000010" AND
+			R_OUT = 0 AND
+			ADDSUB = '0' AND
+			DONE = '1'
+			REPORT "CU is not moving result of adder into register" SEVERITY NOTE;
+		WAIT FOR T;
+		ASSERT 
+			G_IN = '0' AND
+			G_OUT = '0' AND
+			A_IN = '0' AND
+			DIN_OUT = '0' AND 
+			R_IN = "00000000" AND
+			R_OUT = 0 AND
+			ADDSUB = '0' AND
+			DONE = '0'
+			REPORT "CU is not resetting" SEVERITY NOTE;
+		
 		DIN <= "011000011";
-		WAIT FOR 4*T;
+		WAIT FOR T;
+		ASSERT 
+			G_IN = '0' AND
+			G_OUT = '0' AND
+			A_IN = '1' AND
+			DIN_OUT = '0' AND 
+			R_IN = "00000000" AND
+			R_OUT = 1 AND
+			ADDSUB = '0' AND
+			DONE = '0'
+			REPORT "CU is not moving into sub REG A" SEVERITY NOTE;
+		WAIT FOR T;
+		ASSERT 
+			G_IN = '1' AND
+			G_OUT = '0' AND
+			A_IN = '0' AND
+			DIN_OUT = '0' AND 
+			R_IN = "00000000" AND
+			R_OUT = 4 AND
+			ADDSUB = '1' AND
+			DONE = '0'
+			REPORT "CU is not moving into sub REG G" SEVERITY NOTE;
+		WAIT FOR T;
+		ASSERT 
+			G_IN = '0' AND
+			G_OUT = '1' AND
+			A_IN = '0' AND
+			DIN_OUT = '0' AND 
+			R_IN = "00000001" AND
+			R_OUT = 0 AND
+			ADDSUB = '0' AND
+			DONE = '1'
+			REPORT "CU is not moving result of adder into register" SEVERITY NOTE;
+		WAIT FOR T;
+		ASSERT 
+			G_IN = '0' AND
+			G_OUT = '0' AND
+			A_IN = '0' AND
+			DIN_OUT = '0' AND 
+			R_IN = "00000000" AND
+			R_OUT = 0 AND
+			ADDSUB = '0' AND
+			DONE = '0'
+			REPORT "CU is not resetting" SEVERITY NOTE;
+		
+		DIN <= "011001000";
+		WAIT FOR T/2;
+		RESETN <= '1';
+		WAIT FOR T/4;
+		RESETN <= '0';
+		WAIT FOR T/4;
+		WAIT FOR T;
+		ASSERT 
+			G_IN = '0' AND
+			G_OUT = '0' AND
+			A_IN = '0' AND
+			DIN_OUT = '0' AND 
+			R_IN = "00000010" AND
+			R_OUT = 4 AND
+			ADDSUB = '0' AND
+			DONE = '1'
+			REPORT "Reset not performed" SEVERITY NOTE;
 		
 		stop;
 		finish;
