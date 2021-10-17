@@ -10,6 +10,7 @@ foreach f $tb_files {
 
 	add wave /$tb_name/*
 	run -all
+	puts $fp "NAME: $tb_name"
 	puts $fp "[coverage report -assert -detail]"
 	quit -sim
 
