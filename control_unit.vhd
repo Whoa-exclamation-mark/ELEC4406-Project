@@ -16,8 +16,7 @@ ENTITY control_unit IS
 		RUN_SIG						:	IN STD_LOGIC;
 		RESETN						:	IN STD_LOGIC;
 		DONE							: 	OUT STD_LOGIC;
-		DIN							:	IN STD_LOGIC_VECTOR( BIT_LENGTH-1 DOWNTO 0);
-		STATE_VAL					:  OUT STD_LOGIC_VECTOR( 3 DOWNTO 0)
+		DIN							:	IN STD_LOGIC_VECTOR( BIT_LENGTH-1 DOWNTO 0)
 	);
 END control_unit;
 
@@ -56,7 +55,8 @@ BEGIN
 			);
 		
 	clk_proc: 
-		PROCESS (CLK, RESETN) BEGIN
+		PROCESS (CLK, RESETN) 
+		BEGIN
 			IF (RESETN = '1') THEN
 				LS <= T0;
 			-- TODO check if this is okay

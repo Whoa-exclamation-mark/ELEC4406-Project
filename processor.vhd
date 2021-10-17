@@ -4,18 +4,17 @@ USE IEEE.std_logic_1164.all;
 
 ENTITY processor IS
 	GENERIC(	
-				BIT_LENGTH	: 	INTEGER := 9;
-				REG_NUM		:	INTEGER := 8
-		);
+		BIT_LENGTH	: 	INTEGER := 9;
+		REG_NUM		:	INTEGER := 8
+	);
 	PORT(	
-				CLK							:	IN STD_LOGIC;
-				RUN							:	IN STD_LOGIC;
-				RESETN						:	IN STD_LOGIC;
-				DONE							: 	OUT STD_LOGIC;
-				DIN							:	IN STD_LOGIC_VECTOR( BIT_LENGTH-1 DOWNTO 0);
-				DATA_OUT						: 	OUT STD_LOGIC_VECTOR( BIT_LENGTH-1 DOWNTO 0);
-				STATE_VAL					:  OUT STD_LOGIC_VECTOR( 3 DOWNTO 0)
-		);
+		CLK		:	IN STD_LOGIC;
+		RUN		:	IN STD_LOGIC;
+		RESETN	:	IN STD_LOGIC;
+		DONE		: 	OUT STD_LOGIC;
+		DIN		:	IN STD_LOGIC_VECTOR( BIT_LENGTH-1 DOWNTO 0);
+		DATA_OUT	: 	OUT STD_LOGIC_VECTOR( BIT_LENGTH-1 DOWNTO 0)
+	);
 END processor;
 
 ARCHITECTURE processor_rtl OF processor IS
@@ -33,8 +32,7 @@ ARCHITECTURE processor_rtl OF processor IS
 				RUN_SIG						:	IN STD_LOGIC;
 				RESETN						:	IN STD_LOGIC;
 				DONE							: 	OUT STD_LOGIC;
-				DIN							:	IN STD_LOGIC_VECTOR( BIT_LENGTH-1 DOWNTO 0);
-				STATE_VAL					:  OUT STD_LOGIC_VECTOR( 3 DOWNTO 0)
+				DIN							:	IN STD_LOGIC_VECTOR( BIT_LENGTH-1 DOWNTO 0)
 		);
 	END COMPONENT;
 	
@@ -77,8 +75,7 @@ BEGIN
 				RUN_SIG		=> RUN,
 				RESETN		=> RESETN,
 				DONE			=> DONE,
-				DIN			=> DIN,
-				STATE_VAL	=> STATE_VAL
+				DIN			=> DIN
 		);
 		
 	alu_comp: alu

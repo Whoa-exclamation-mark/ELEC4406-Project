@@ -20,19 +20,21 @@ ARCHITECTURE counter_rtl OF counter IS
 
 BEGIN
 	
-	clk_proc: PROCESS (CLK, RST)
-	BEGIN
-		IF (CLK'EVENT AND CLK = '1') THEN 
-			IF (count < 2**ADDR_SPACE) THEN
-				count <= count+1;
-			ELSE 
+	clk_proc: 
+		PROCESS (CLK, RST)
+		BEGIN
+			IF (CLK'EVENT AND CLK = '1') THEN 
+				IF (count < 2**ADDR_SPACE) THEN
+					count <= count+1;
+				ELSE 
+					count <= 0;
+				END IF;
+			END IF;
+			
+			IF (RST = '1') THEN
 				count <= 0;
 			END IF;
-		END IF;
-		IF (RST = '1') THEN
-			count <= 0;
-		END IF;
-	END PROCESS;
+		END PROCESS;
 	
 	ADDR <= std_logic_vector(to_unsigned(count, ADDR_SPACE));
 	
